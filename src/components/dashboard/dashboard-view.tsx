@@ -43,11 +43,24 @@ const numberFormatter = new Intl.NumberFormat("fa-IR", {
   maximumFractionDigits: 0,
 });
 
+class DashboardRequestError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+  ) {
+    super(message);
+  }
+}
+
 async function fetchTrends(range: number): Promise<TrendResponse> {
   const response = await fetch(`/api/trends?range=${range}`);
   const payload = (await response.json()) as TrendResponse & { error?: string };
-  if (!response.ok)
-    throw new Error(payload.error ?? "بارگذاری داشبورد انجام نشد.");
+  if (!response.ok) {
+    throw new DashboardRequestError(
+      payload.error ?? "بارگذاری داشبورد انجام نشد.",
+      response.status,
+    );
+  }
   return payload;
 }
 
@@ -77,7 +90,7 @@ export function DashboardView() {
     return (
       <DashboardMessage
         text={error?.message ?? "داشبورد در دسترس نیست."}
-        login
+        login={error instanceof DashboardRequestError && error.status === 401}
       />
     );
 
@@ -363,7 +376,7 @@ function DashboardMessage({
       <Card className="max-w-md p-6 text-center">
         <Coffee className="mx-auto size-6 text-forest" aria-hidden />
         <p className="mt-4 text-base font-extrabold">
-          فعلاً داشبورد آماده نیست
+          {login ? "ورود به حساب لازم است" : "داشبورد فعلاً در دسترس نیست"}
         </p>
         <p className="mt-2 text-sm leading-7 text-ink/65">{text}</p>
         {login && (
