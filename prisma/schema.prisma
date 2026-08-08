@@ -1,0 +1,197 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  id                  String     @id @db.Uuid
+  fullName            String?    @map("full_name")
+  gender              String?
+  birthDate           DateTime?  @db.Date @map("birth_date")
+  heightCm            Decimal?   @db.Decimal(5, 2) @map("height_cm")
+  activityLevel       String?    @map("activity_level")
+  goal                String?
+  medicalConditions   String[]   @default([]) @map("medical_conditions")
+  dailyCalorieTarget   Decimal?   @db.Decimal(8, 2) @map("daily_calorie_target")
+  bodyAnalysisConsentAt DateTime? @map("body_analysis_consent_at") @db.Timestamptz(6)
+  createdAt            DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  weightLogs          WeightLog[]
+  mealLogs            MealLog[]
+  dietPlans           DietPlan[]
+  bodyPhotos          BodyPhoto[]
+  aiUsageLogs         AiUsageLog[]
+  appNotifications    AppNotification[]
+
+  @@map("profiles")
+}
+
+model WeightLog {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  weightKg  Decimal  @db.Decimal(5, 2) @map("weight_kg")
+  loggedAt  DateTime @default(now()) @map("logged_at") @db.Timestamptz(6)
+  user      Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, loggedAt])
+  @@map("weight_logs")
+}
+
+model MealLog {
+  id             String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId         String     @map("user_id") @db.Uuid
+  mealType       String     @map("meal_type")
+  photoUrl       String?    @map("photo_url")
+  userDescription String?   @map("user_description")
+  totalCalories  Decimal    @db.Decimal(8, 2) @map("total_calories")
+  totalProteinG  Decimal    @db.Decimal(8, 2) @map("total_protein_g")
+  totalCarbsG    Decimal    @db.Decimal(8, 2) @map("total_carbs_g")
+  totalFatG      Decimal    @db.Decimal(8, 2) @map("total_fat_g")
+  loggedAt       DateTime   @default(now()) @map("logged_at") @db.Timestamptz(6)
+  createdAt      DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  user           Profile    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items          MealItem[]
+
+  @@index([userId, loggedAt])
+  @@map("meal_logs")
+}
+
+model MealItem {
+  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  mealLogId String  @map("meal_log_id") @db.Uuid
+  name      String
+  quantity  String?
+  calories  Decimal @db.Decimal(8, 2)
+  proteinG  Decimal @db.Decimal(8, 2) @map("protein_g")
+  carbsG    Decimal @db.Decimal(8, 2) @map("carbs_g")
+  fatG      Decimal @db.Decimal(8, 2) @map("fat_g")
+  source    String
+  mealLog   MealLog @relation(fields: [mealLogId], references: [id], onDelete: Cascade)
+
+  @@index([mealLogId])
+  @@map("meal_items")
+}
+
+model DietPlan {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  content     Json
+  isActive    Boolean  @default(true) @map("is_active")
+  generatedAt DateTime @default(now()) @map("generated_at") @db.Timestamptz(6)
+  user        Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, generatedAt])
+  @@map("diet_plans")
+}
+
+model BodyPhoto {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  photoUrl       String   @map("photo_url")
+  aiObservations Json?    @map("ai_observations")
+  takenAt        DateTime @default(now()) @map("taken_at") @db.Timestamptz(6)
+  user           Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, takenAt])
+  @@map("body_photos")
+}
+
+model AdminUser {
+  userId    String          @id @map("user_id") @db.Uuid
+  role      String
+  createdAt DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
+  auditLogs AdminAuditLog[]
+
+  @@map("admin_users")
+}
+
+model AdminAuditLog {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  adminUserId String    @map("admin_user_id") @db.Uuid
+  action      String
+  targetType  String    @map("target_type")
+  targetId    String?   @map("target_id")
+  metadata    Json      @default("{}")
+  ipAddress   String?   @map("ip_address") @db.Inet
+  userAgent   String?   @map("user_agent")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  adminUser   AdminUser @relation(fields: [adminUserId], references: [userId], onDelete: Restrict)
+
+  @@index([adminUserId, createdAt])
+  @@index([targetType, targetId, createdAt])
+  @@map("admin_audit_log")
+}
+
+model Food {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String
+  normalizedName    String    @unique @map("normalized_name")
+  aliases           String[]  @default([])
+  category          String?
+  servingSizeG      Decimal?  @map("serving_size_g") @db.Decimal(8, 2)
+  caloriesPer100g   Decimal   @map("calories_per_100g") @db.Decimal(8, 2)
+  proteinGPer100g   Decimal   @default(0) @map("protein_g_per_100g") @db.Decimal(8, 2)
+  carbsGPer100g     Decimal   @default(0) @map("carbs_g_per_100g") @db.Decimal(8, 2)
+  fatGPer100g       Decimal   @default(0) @map("fat_g_per_100g") @db.Decimal(8, 2)
+  fiberGPer100g     Decimal?  @map("fiber_g_per_100g") @db.Decimal(8, 2)
+  isActive          Boolean   @default(true) @map("is_active")
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@index([isActive, category])
+  @@map("foods")
+}
+
+model AiUsageLog {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String?   @map("user_id") @db.Uuid
+  feature          String
+  provider         String
+  model            String
+  inputTokens      Int       @default(0) @map("input_tokens")
+  outputTokens     Int       @default(0) @map("output_tokens")
+  totalTokens      Int       @default(0) @map("total_tokens")
+  estimatedCostUsd Decimal?  @map("estimated_cost_usd") @db.Decimal(12, 6)
+  status           String    @default("success")
+  metadata         Json      @default("{}")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  user             Profile?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([feature, createdAt])
+  @@index([status, createdAt])
+  @@map("ai_usage_logs")
+}
+
+model AppNotification {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  type      String   @default("info")
+  title     String
+  body      String
+  data      Json     @default("{}")
+  readAt    DateTime? @map("read_at") @db.Timestamptz(6)
+  expiresAt DateTime? @map("expires_at") @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  user      Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("app_notifications")
+}
+
+model SystemFlag {
+  key         String   @id
+  enabled     Boolean  @default(true)
+  value       Json     @default("{}")
+  description String?
+  isPublic    Boolean  @default(false) @map("is_public")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@index([isPublic])
+  @@map("system_flags")
+}
