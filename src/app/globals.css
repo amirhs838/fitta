@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 :root {
-    --paper: #f6f7f2;
+    --paper: #f5f5f3;
     --surface: #ffffff;
-    --forest: #1f4d3a;
-    --saffron: #e8a33d;
-    --barberry: #b5495b;
-    --ink: #1c1b18;
-    --mist: #dde3d9;
-    --shadow-card: 0 16px 36px rgb(31 77 58 / 7%), 0 2px 6px rgb(28 27 24 / 4%);
-    --shadow-button: 0 8px 18px rgb(31 77 58 / 18%);
+    --forest: #111111;
+    --saffron: #111111;
+    --barberry: #9f3546;
+    --ink: #111111;
+    --mist: #e7e7e4;
+    --shadow-card: 0 1px 1px rgb(17 17 17 / 3%), 0 8px 24px rgb(17 17 17 / 4%);
+    --shadow-button: 0 10px 20px rgb(17 17 17 / 16%);
 }
 
 @theme inline {
@@ -28,11 +28,9 @@
 * {
     border-color: var(--mist);
 }
-
 html {
     background: var(--paper);
 }
-
 body {
     min-width: 360px;
     background: var(--paper);
@@ -40,31 +38,28 @@ body {
     font-family: var(--font-vazirmatn), sans-serif;
     font-variant-numeric: tabular-nums;
 }
-
 button,
 a,
 input {
     -webkit-tap-highlight-color: transparent;
 }
-
 ::selection {
-    background: color-mix(in srgb, var(--saffron) 45%, transparent);
+    background: #dcdcd8;
     color: var(--ink);
 }
 
-.day-horizon {
-    background: linear-gradient(
-        112deg,
-        var(--forest),
-        color-mix(in srgb, var(--forest) 68%, var(--saffron)),
-        var(--saffron)
-    );
-    box-shadow: 0 18px 40px rgb(31 77 58 / 18%);
+/* The native-app shell keeps content clear of the fixed mobile navigation. */
+body:has(.app-bottom-nav) main {
+    padding-bottom: max(7.75rem, env(safe-area-inset-bottom));
 }
 
+.day-horizon {
+    background: #111111;
+    box-shadow: 0 16px 32px rgb(17 17 17 / 12%);
+}
 .horizon-line {
-    height: 2px;
-    background: color-mix(in srgb, var(--surface) 62%, transparent);
+    height: 1px;
+    background: rgb(255 255 255 / 38%);
 }
 
 .calorie-ring,
@@ -72,25 +67,19 @@ input {
     display: grid;
     place-items: center;
     border-radius: 9999px;
-    background: conic-gradient(
-        var(--saffron) var(--progress),
-        color-mix(in srgb, var(--surface) 24%, transparent) 0deg
-    );
+    background: conic-gradient(var(--ink) var(--progress), #e5e5e2 0deg);
 }
-
 .calorie-ring {
     width: 64px;
     height: 64px;
     padding: 4px;
-    box-shadow: 0 8px 18px rgb(28 27 24 / 18%);
+    box-shadow: 0 8px 18px rgb(0 0 0 / 20%);
 }
-
 .dashboard-ring {
     width: 76px;
     height: 76px;
     padding: 6px;
 }
-
 .calorie-ring-inner,
 .dashboard-ring-inner {
     display: grid;
@@ -100,8 +89,78 @@ input {
     border-radius: inherit;
     background: var(--surface);
 }
-
 .calorie-ring-inner {
-    background: var(--forest);
+    background: var(--surface);
+    color: var(--ink);
+}
+
+.app-bottom-nav {
+    position: fixed;
+    z-index: 40;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    padding: 0 12px calc(10px + env(safe-area-inset-bottom));
+    pointer-events: none;
+}
+.app-bottom-nav-inner {
+    display: grid;
+    width: min(100%, 500px);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: end;
+    min-height: 68px;
+    border: 1px solid var(--mist);
+    border-radius: 22px;
+    background: rgb(255 255 255 / 92%);
+    box-shadow: 0 12px 36px rgb(17 17 17 / 13%);
+    backdrop-filter: blur(16px);
+    pointer-events: auto;
+}
+.app-nav-item {
+    display: flex;
+    min-height: 62px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    border-radius: 16px;
+    color: #8c8c88;
+    font-size: 10px;
+    font-weight: 500;
+    outline: none;
+}
+.app-nav-item:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--ink);
+}
+.app-nav-item-active {
+    color: var(--ink);
+    font-weight: 800;
+}
+.app-nav-icon {
+    display: grid;
+    place-items: center;
+}
+.app-nav-item-primary {
+    transform: translateY(-17px);
+    color: var(--ink);
+    font-weight: 700;
+}
+.app-nav-item-primary .app-nav-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 9999px;
+    background: var(--ink);
     color: var(--surface);
+    box-shadow: 0 8px 18px rgb(17 17 17 / 22%);
+}
+
+@media (min-width: 768px) {
+    .app-bottom-nav {
+        padding-bottom: 16px;
+    }
+    .app-bottom-nav-inner {
+        width: min(500px, calc(100% - 32px));
+    }
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { AppBottomNavigation } from "@/components/navigation/app-bottom-navigation";
 import { QueryProvider } from "@/components/providers/query-provider";
 import "./globals.css";
 
@@ -21,7 +22,10 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl" className={`${vazirmatn.variable} h-full`}>
       <body className="min-h-full">
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          {children}
+          <AppBottomNavigation />
+        </QueryProvider>
       </body>
     </html>
   );

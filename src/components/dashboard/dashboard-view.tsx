@@ -15,17 +15,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import {
-  ArrowLeft,
-  ChefHat,
-  Coffee,
-  HeartPulse,
-  Cookie,
-  Plus,
-  Salad,
-  Soup,
-  UserRound,
-} from "lucide-react";
+import { Bell, Coffee, Cookie, Salad, Soup, UserRound } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { DayHorizon } from "@/components/dashboard/day-horizon";
 import { InAppNotifications } from "@/components/notifications/in-app-notifications";
@@ -111,39 +101,29 @@ export function DashboardView() {
   return (
     <main className="min-h-screen bg-paper pb-28">
       <div className="mx-auto w-full max-w-4xl px-4 py-5 sm:px-8 sm:py-8">
-        <header className="flex items-center justify-between">
+        <header className="flex items-center justify-between gap-4">
           <div>
-            <Link
-              className="rounded-lg text-sm font-semibold text-forest focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest"
-              href="/"
-            >
-              فیتا
-            </Link>
-            <h1 className="mt-2 text-3xl font-extrabold tracking-tight">
-              نمای امروز
+            <p className="text-xs font-medium text-ink/55">
+              امروز، قدم بعدی تو
+            </p>
+            <h1 className="mt-1 text-2xl font-extrabold tracking-tight sm:text-3xl">
+              سلام، آماده‌ای؟
             </h1>
           </div>
-          <div className="flex flex-wrap justify-end gap-2">
+          <div className="flex items-center gap-2">
             <Link
-              className="inline-flex items-center gap-2 rounded-full bg-surface px-3 py-2 text-xs font-medium text-ink/70 shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest"
-              href="/diet-plan"
-            >
-              <ChefHat className="size-4 text-forest" aria-hidden />
-              برنامه
-            </Link>
-            <Link
-              className="inline-flex items-center gap-2 rounded-full bg-surface px-3 py-2 text-xs font-medium text-ink/70 shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest"
+              className="grid size-11 place-items-center rounded-2xl border border-mist bg-surface text-ink transition-colors hover:bg-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
               href="/body-analysis"
+              aria-label="تحلیل بدن"
             >
-              <HeartPulse className="size-4 text-forest" aria-hidden />
-              بدن
+              <Bell className="size-5" aria-hidden />
             </Link>
             <Link
-              className="inline-flex items-center gap-2 rounded-full bg-surface px-3 py-2 text-xs font-medium text-ink/70 shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest"
+              className="grid size-11 place-items-center rounded-2xl bg-ink text-surface shadow-button transition-colors hover:bg-ink/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
               href="/profile"
+              aria-label="پروفایل"
             >
-              <UserRound className="size-4 text-forest" aria-hidden />
-              پروفایل
+              <UserRound className="size-5" aria-hidden />
             </Link>
           </div>
         </header>
@@ -224,7 +204,7 @@ export function DashboardView() {
                   />
                   <Bar
                     dataKey="calories"
-                    fill="var(--saffron)"
+                    fill="var(--forest)"
                     radius={[6, 6, 6, 6]}
                   />
                 </BarChart>
@@ -253,7 +233,7 @@ export function DashboardView() {
           ))}
         </section>
 
-        <section className="mt-8">
+        <section className="mt-8" id="trend">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-xl font-extrabold">روند مصرف</h2>
@@ -327,14 +307,6 @@ export function DashboardView() {
           </Card>
         </section>
       </div>
-      <Link
-        className="fixed bottom-5 left-1/2 inline-flex min-h-14 -translate-x-1/2 items-center justify-center gap-2 rounded-2xl bg-saffron px-5 text-sm font-extrabold text-ink shadow-button transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
-        href="/meals"
-      >
-        <Plus className="size-5" aria-hidden />
-        ثبت وعده
-        <ArrowLeft className="size-4" aria-hidden />
-      </Link>
     </main>
   );
 }
