@@ -25,7 +25,16 @@
 
 3. در Supabase، مسیر `http://localhost:3000/auth/callback` را در **Authentication → URL Configuration → Redirect URLs** اضافه کنید.
 
-4. پروژه را اجرا کنید:
+4. در Supabase، مسیر `Authentication → URL Configuration` را باز کنید و برای Production این مقادیر را ثبت کنید:
+
+   ```text
+   Site URL: https://fitta-fawn.vercel.app
+   Redirect URL: https://fitta-fawn.vercel.app/auth/callback
+   ```
+
+   مقدار localhost را فقط برای توسعهٔ محلی نگه دارید. بدون این مرحله، لینک تأیید ایمیل ممکن است به localhost برگردد.
+
+5. پروژه را اجرا کنید:
 
    ```bash
    npm run dev
@@ -44,6 +53,7 @@
 | `AI_PROVIDER` | یکی از `openai`، `anthropic` یا `gemini` |
 | `AI_PROVIDER_API_KEY` | کلید ارائه‌دهندهٔ Vision AI؛ فقط در Route Handler استفاده می‌شود |
 | `AI_MODEL` | اختیاری؛ نام مدل Vision انتخاب‌شده |
+| `CAPACITOR_SERVER_URL` | اختیاری؛ URL وب‌اپ برای build بومی. پیش‌فرض فعلی `https://fitta-fawn.vercel.app` است. |
 
 ## وضعیت توسعه
 
@@ -143,6 +153,17 @@ values ('UUID_OF_EXISTING_AUTH_USER', 'super_admin');
 
 هرگز نقش ادمین را از فرم ثبت‌نام عمومی نسازید. برای حساب‌های ادمین فعال‌سازی 2FA توصیه می‌شود.
 
+### ساخت APK قابل‌دانلود
+
+workflow فایل `.github/workflows/android-release.yml` با push کردن یک tag از نوع `v*`، یک Debug APK می‌سازد و آن را در GitHub Release منتشر می‌کند.
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+پس از پایان GitHub Action، فایل در صفحهٔ Releases repository قابل دانلود است. این APK برای نصب مستقیم و تست است؛ پیش از انتشار عمومی یا Google Play، باید workflow را به Keystore اختصاصی و Release signing مجهز کنید.
+
 ### فاز ۸ (انجام‌شده) — بسته‌بندی موبایل
 
 - Capacitor 7 و پروژه‌های بومی `android/` و `ios/` به پروژه افزوده شدند.
@@ -176,5 +197,6 @@ values ('UUID_OF_EXISTING_AUTH_USER', 'super_admin');
    سپس target را در Xcode روی یک شبیه‌ساز یا دستگاه انتخاب و اجرا کن. قبل از build نخست، `npm run mobile:sync` را با `CAPACITOR_SERVER_URL` تنظیم‌شده اجرا کن.
 
 > تخمین‌های غذایی هوش مصنوعی تقریبی‌اند و جایگزین توصیهٔ پزشکی یا تغذیه‌ای نیستند. عکس‌های بدن در فاز ۶ با جریان رضایت آگاهانه و Storage خصوصی جداگانه پیاده‌سازی می‌شوند.
-#   f i t t a  
+#   f i t t a 
+ 
  

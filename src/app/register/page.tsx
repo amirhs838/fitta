@@ -15,10 +15,13 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [canResend, setCanResend] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage(null);
+    setCanResend(false);
 
     if (!isSupabaseConfigured) {
       setMessage(
@@ -37,7 +40,9 @@ export default function RegisterPage() {
 
     if (error) {
       setMessage(
-        "ساخت حساب انجام نشد. رمز عبور قوی‌تر یا ایمیل دیگری امتحان کن.",
+        error.message.toLowerCase().includes("rate limit")
+          ? "تعداد درخواست‌های تأیید زیاد شده است؛ چند دقیقه بعد دوباره امتحان کن."
+          : "ساخت حساب انجام نشد. رمز عبور قوی‌تر یا ایمیل دیگری امتحان کن.",
       );
       return;
     }
@@ -45,12 +50,30 @@ export default function RegisterPage() {
     setMessage(
       data.session
         ? "حسابت ساخته شد؛ در حال ورود هستی…"
-        : "حسابت ساخته شد. برای تأیید، لینک ارسال‌شده به ایمیلت را باز کن.",
+        : "حسابت ساخته شد. پوشهٔ Spam را هم بررسی کن؛ در صورت نیاز لینک را دوباره بفرست.",
     );
+    setCanResend(!data.session);
     if (data.session) {
       router.push("/dashboard");
       router.refresh();
     }
+  }
+
+  async function resendConfirmation() {
+    if (!email || !isSupabaseConfigured) return;
+    setIsResending(true);
+    setMessage(null);
+    const { error } = await createClient().auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    });
+    setIsResending(false);
+    setMessage(
+      error
+        ? "ارسال دوبارهٔ لینک انجام نشد. چند دقیقه صبر کن و پوشهٔ Spam را بررسی کن."
+        : "لینک تأیید دوباره ارسال شد. اگر آن را ندیدی، پوشهٔ Spam را هم بررسی کن.",
+    );
   }
 
   return (
@@ -108,6 +131,18 @@ export default function RegisterPage() {
             >
               {message}
             </p>
+          )}
+          {canResend && (
+            <button
+              className="w-full rounded-xl border border-mist px-3 py-2 text-sm font-semibold text-ink transition-colors hover:bg-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+              type="button"
+              disabled={isResending}
+              onClick={() => void resendConfirmation()}
+            >
+              {isResending
+                ? "در حال ارسال دوباره…"
+                : "ارسال دوبارهٔ لینک تأیید"}
+            </button>
           )}
           <Button className="w-full" type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
