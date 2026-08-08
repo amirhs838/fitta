@@ -38,7 +38,9 @@ jobs:
         run: npm run mobile:sync -- android
 
       - name: Build debug APK
-        run: ./android/gradlew -p android assembleDebug
+        run: |
+          chmod +x android/gradlew
+          ./android/gradlew -p android assembleDebug
 
       - name: Publish APK to GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
